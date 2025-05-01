@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections import deque
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Generic, TypeVar
 
 T = TypeVar("T")
@@ -9,7 +9,7 @@ T = TypeVar("T")
 
 @dataclass
 class History(Generic[T]):
-    history: deque[T] = deque(maxlen=20)
+    history: deque[T] = field(default_factory=lambda: deque(maxlen=20))
     index: int = -1
 
     def __init__(self, maxlen: int) -> None:
