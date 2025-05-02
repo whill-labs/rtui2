@@ -81,22 +81,37 @@ def _common_link(name: str, callback: str) -> str:
     return f"[@click={callback}('{name}')]{name}[/]"
 
 
-def _common_entities_with_type(
-    entities: list[tuple[str, str | None]], callback: str, type_callback: str
+def _common_entities_with_type_and_qos(
+    entities: list[tuple[str, str | None] | tuple[str, str, str | None]], callback: str, type_callback: str
 ) -> str:
     if not entities:
         return " None"
 
     out = ""
-    for i, (name, type_) in enumerate(entities):
+    for i, entity in enumerate(entities):
         if i > 0 and i % 5 == 0:
             out += "\n"
+
+        name = entity[0]
+        type_ = entity[1]
+        qos_profile = entity[2] if len(entity) == 3 else None
 
         out += f"\n  {_common_link(name, callback)}"
         if type_ is not None:
             out += f" \\[{_common_link(type_, type_callback)}]"
+        if qos_profile is not None:
+            # do not link QoS profile
+            out += f"\n    {qos_profile.replace('{', '{\n        ').replace(',', ',\n        ').replace('}', '\n    }')}"
 
     return out
+
+
+def _common_entities_with_type(
+    entities: list[tuple[str, str | None]], callback: str, type_callback: str
+) -> str:
+    return _common_entities_with_type_and_qos(
+        entities, callback, type_callback
+    )  # type: ignore[no-untyped-call]
 
 
 def _common_entities(entities: list[str], callback: str) -> str:
@@ -161,17 +176,17 @@ class NodeInfo(RosEntityInfo):
 class TopicInfo(RosEntityInfo):
     name: str
     types: list[str] = field(default_factory=list)
-    publishers: list[tuple[str, str | None]] = field(default_factory=list)
-    subscribers: list[tuple[str, str | None]] = field(default_factory=list)
+    publishers: list[tuple[str, str | None] | tuple[str, str, str | None]] = field(default_factory=list)
+    subscribers: list[tuple[str, str | None] | tuple[str, str, str | None]] = field(default_factory=list)
 
     def to_textual(self) -> str:
         return f"""[b]Topic:[/b] {self.name}
 
 [b]Type:[/b] {_common_types(self.types, "msg_type_link")}
 
-[b]Publishers:[/b]{_common_entities_with_type(self.publishers, "node_link", "msg_type_link")}
+[b]Publishers:[/b]{_common_entities_with_type_and_qos(self.publishers, "node_link", "msg_type_link")}
 
-[b]Subscribers:[/b]{_common_entities_with_type(self.subscribers, "node_link", "msg_type_link")}
+[b]Subscribers:[/b]{_common_entities_with_type_and_qos(self.subscribers, "node_link", "msg_type_link")}
 """
 
 

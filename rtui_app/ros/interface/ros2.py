@@ -23,6 +23,7 @@ from rosidl_runtime_py import (
     get_message_interfaces,
     get_service_interfaces,
 )
+from rclpy.topic_endpoint_info import QoSProfile
 
 from .base import RosInterface, RosVersion
 
@@ -167,18 +168,30 @@ class Ros2(RosInterface):
 
         return []
 
-    def get_topic_publishers(self, topic_name: str) -> list[tuple[str, str]]:
+    def _format_qos(self, qos: QoSProfile) -> str:
+        return "qos_profile: {" + \
+        f"reliability: {qos.reliability.name}," + \
+        f"durability: {qos.durability.name}," + \
+        f"history: {qos.history.name}," + \
+        f"depth: {qos.depth}," + \
+        f"liveliness: {qos.liveliness.name}," + \
+        f"liveliness_lease_duration: {qos.liveliness_lease_duration}," + \
+        f"avoid_ros_namespace_conventions: {qos.avoid_ros_namespace_conventions}," + \
+        f"deadline: {qos.deadline}," + \
+        f"lifespan: {qos.lifespan}" + \
+        "}"
+
+    def get_topic_publishers(self, topic_name: str) -> list[tuple[str, str, str]]:
         pubs = self.node.get_publishers_info_by_topic(topic_name)
         return list(
-            (_get_full_path(comm.node_namespace, comm.node_name), comm.topic_type)
+            (_get_full_path(comm.node_namespace, comm.node_name), comm.topic_type, self._format_qos(comm.qos_profile))
             for comm in pubs
         )
 
-    def get_topic_subscribers(self, topic_name: str) -> list[tuple[str, str]]:
+    def get_topic_subscribers(self, topic_name: str) -> list[tuple[str, str, str]]:
         subs = self.node.get_subscriptions_info_by_topic(topic_name)
-
         return list(
-            (_get_full_path(comm.node_namespace, comm.node_name), comm.topic_type)
+            (_get_full_path(comm.node_namespace, comm.node_name), comm.topic_type, self._format_qos(comm.qos_profile))
             for comm in subs
         )
 
