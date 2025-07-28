@@ -100,6 +100,8 @@ def main() -> None:
     cli.add_command(services)
 
     if is_ros2():
+        # for discovery server
+        environ["ROS_SUPER_CLIENT"] = "true"
         cli.add_command(action)
         type.add_command(type_action)
 
