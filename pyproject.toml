@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "A TUI tool for ROS 2 Topic/Node debugging"
 authors = ["Daisuke Sato <daisuke.sato@whill.inc>"]
 repository = "https://github.com/whill-labs/rtui2"
-license = "Apache License, Version 2.0"
+license = "Apache-2.0"
 readme = "README.md"
 
 [tool.poetry.scripts]
