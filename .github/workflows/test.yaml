@@ -30,38 +30,6 @@ jobs:
       - name: Check Lint and Format
         run: poetry run task check
 
-  test-ros1:
-    runs-on: ubuntu-20.04
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup ROS environment
-        run: |
-          sudo apt update -q
-          sudo apt install -yqq curl gnupg2
-
-          curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
-          echo "deb http://packages.ros.org/ros/ubuntu focal main" | sudo tee /etc/apt/sources.list.d/ros-latest.list > /dev/null
-          sudo apt update -q
-          sudo apt install -yqq \
-            ros-noetic-ros-base \
-            ros-noetic-rospy
-
-      - name: Install Poetry
-        run: |
-          curl -sSL https://install.python-poetry.org | python3 -
-          echo "$HOME/.poetry/bin" >> $GITHUB_PATH
-
-      - name: Install Dependencies
-        run: poetry install --no-interaction
-
-      - name: Unit Test
-        run: |
-          source /opt/ros/noetic/setup.bash
-          roscore &
-          poetry run task test
-
   test-ros2:
     strategy:
       fail-fast: false
@@ -69,8 +37,8 @@ jobs:
       matrix:
         ros:
           - { distro: humble, os: ubuntu-22.04 }
-          - { distro: iron, os: ubuntu-22.04 }
-          - { distro: rolling, os: ubuntu-22.04 }
+          - { distro: jazzy, os: ubuntu-24.04 }
+          - { distro: rolling, os: ubuntu-24.04 }
 
     runs-on: ${{ matrix.ros.os }}
 
