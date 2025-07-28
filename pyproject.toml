@@ -8,7 +8,7 @@ license = "Apache-2.0"
 readme = "README.md"
 
 [tool.poetry.scripts]
-rtui = "rtui2.cli:main"
+rtui2 = "rtui2.cli:main"
 
 [tool.poetry.dependencies]
 python = "^3.10"
