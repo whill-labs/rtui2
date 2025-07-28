@@ -1,35 +1,29 @@
 # rtui
 
-[![PyPI - Version](https://img.shields.io/pypi/v/rtui-app)](https://pypi.org/project/rtui-app/)
+[![PyPI - Version](https://img.shields.io/pypi/v/rtui2)](https://pypi.org/project/rtui2/)
 
-rtui is ROS Terminal User Interface
+TUI tool for ROS 2 Topic/Node debugging
 
 ## Support
 
 - Python
-  - 3.8+
-- ROS1
-  - noetic
+  - 3.10+
 - ROS2
-  - humble
-  - ironic
+  - Humble
+  - Jazzy
 
 ## Install
-
-> **Note**  
-> Package name is changed because rtui is already used by other package.  
-> If you have already installed rtui, please uninstall it and install rtui-app.
 
 Via [pipx](https://github.com/pypa/pipx) (Recommended)
 
 ```sh-session
-$ pipx install rtui-app
+$ pipx install rtui2
 ```
 
 Pip
 
 ```sh-session
-$ pip3 install --user rtui-app
+$ pip3 install --user rtui2
 ```
 
 ## Demo
@@ -63,3 +57,12 @@ Commands:
     - `b/f`: Trace history backward and forward
     - `r`: Once more get list of nodes, topics or etc.
     - `q`: Terminate app
+
+## License
+
+This project was developed by WHILL Inc. and is released under the Apache License, Version 2.0. See [NOTICE](./NOTICE) for details.
+
+### Acknowledgements
+
+This product is based on the "rtui" project (https://github.com/eduidl/rtui), which is licensed under the Apache License, Version 2.0.
+

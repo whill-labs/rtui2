@@ -1,6 +1,6 @@
 import unittest
 
-from rtui_app.utility.hisotry import History
+from rtui2.utility.hisotry import History
 
 
 def init_history() -> History:

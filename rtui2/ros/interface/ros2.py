@@ -69,7 +69,9 @@ class Ros2(RosInterface):
     node: Node
 
     def __init__(self, start_parameter_services: bool = False) -> None:
-        rclpy.init()
+        if not rclpy.ok():
+            rclpy.logging.get_logger("rtui2").info("skipping rclpy.init()")
+            rclpy.init()
         self.node = rclpy.create_node(
             "_rtui",
             enable_rosout=False,

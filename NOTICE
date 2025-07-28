@@ -1,0 +1,12 @@
+Copyright 2025 WHILL Inc.
+
+This project was developed by WHILL Inc. and is released under the Apache License, Version 2.0. See LICENSE for details.
+
+Unless otherwise noted, all contents of this repository are licensed under the Apache License, Version 2.0.
+
+This product incorporates code from the following external projects:
+
+--- rtui ---
+Based on "rtui" (https://github.com/eduidl/rtui)
+Licensed under the Apache License, Version 2.0
+Copyright 2022 Yuma Hiramatsu
