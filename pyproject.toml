@@ -15,9 +15,9 @@ python = "^3.10"
 click = "^8.1.3"
 textual = "^0.40"
 typing-extensions = "^4.3.0"
-
 netifaces = "^0.11.0"
 numpy = "^1.23.0"
+PyYAML = "^6.0.1"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23"
