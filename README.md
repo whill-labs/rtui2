@@ -33,7 +33,7 @@ $ pip3 install --user rtui2
 ## Usage
 
 ```
-Usage: rtui [OPTIONS] COMMAND [ARGS]...
+Usage: rtui2 [OPTIONS] COMMAND [ARGS]...
 
   Terminal User Interface for ROS User
 
@@ -65,4 +65,3 @@ This project was developed by WHILL Inc. and is released under the Apache Licens
 ### Acknowledgements
 
 This product is based on the "rtui" project (https://github.com/eduidl/rtui), which is licensed under the Apache License, Version 2.0.
-
