@@ -4,7 +4,9 @@ import typing as t
 import unittest
 import warnings
 
-from rtui_app.ros.interface.ros2 import Ros2
+import rclpy
+
+from rtui2.ros.interface.ros2 import Ros2
 
 from .node.dummy_node1 import DummyNode1
 from .node.dummy_node2 import DummyNode2
@@ -25,6 +27,10 @@ class TestRos2Interface(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
+        # Initialize rclpy first, then create all nodes
+        if not rclpy.ok():
+            rclpy.init()
+
         cls.ROS = Ros2()
         cls.NODE1 = DummyNode1()
         cls.NODE2 = DummyNode2()
@@ -70,16 +76,38 @@ class TestRos2Interface(unittest.TestCase):
         self.assertEqual(types, ["std_msgs/msg/String"])
 
     def test_get_topic_publishers(self):
-        self.assertEqual(
-            self.ROS.get_topic_publishers("/topic"),
-            [("/dummy_node1", "std_msgs/msg/String")],
-        )
+        # Debug: Check what topics and nodes are available
+        topics = self.ROS.list_topics()
+        nodes = self.ROS.list_nodes()
+        print(f"Available topics: {topics}")
+        print(f"Available nodes: {nodes}")
+
+        # Debug: Check node publishers info
+        node1_pubs = self.ROS.get_node_publishers("/dummy_node1")
+        print(f"Node1 publishers: {node1_pubs}")
+
+        publishers = self.ROS.get_topic_publishers("/topic")
+        print(f"Publishers for /topic: {publishers}")
+
+        # Check that we have the expected publisher (node, type, qos)
+        self.assertEqual(len(publishers), 1)
+        self.assertEqual(publishers[0][0], "/dummy_node1")
+        self.assertEqual(publishers[0][1], "std_msgs/msg/String")
+        # Third element should be QoS profile string
+        self.assertIn("qos_profile:", publishers[0][2])
+        self.assertIn("reliability:", publishers[0][2])
+        self.assertIn("durability:", publishers[0][2])
 
     def test_get_topic_subscribers(self):
-        self.assertEqual(
-            self.ROS.get_topic_subscribers("/topic"),
-            [("/dummy_node2", "std_msgs/msg/String")],
-        )
+        subscribers = self.ROS.get_topic_subscribers("/topic")
+        # Check that we have the expected subscriber (node, type, qos)
+        self.assertEqual(len(subscribers), 1)
+        self.assertEqual(subscribers[0][0], "/dummy_node2")
+        self.assertEqual(subscribers[0][1], "std_msgs/msg/String")
+        # Third element should be QoS profile string
+        self.assertIn("qos_profile:", subscribers[0][2])
+        self.assertIn("reliability:", subscribers[0][2])
+        self.assertIn("durability:", subscribers[0][2])
 
     def test_get_service_types(self):
         self.assertEqual(

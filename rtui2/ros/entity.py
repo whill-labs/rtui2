@@ -82,7 +82,9 @@ def _common_link(name: str, callback: str) -> str:
 
 
 def _common_entities_with_type_and_qos(
-    entities: list[tuple[str, str | None] | tuple[str, str, str | None]], callback: str, type_callback: str
+    entities: list[tuple[str, str | None] | tuple[str, str, str | None]],
+    callback: str,
+    type_callback: str,
 ) -> str:
     if not entities:
         return " None"
@@ -101,7 +103,12 @@ def _common_entities_with_type_and_qos(
             out += f" \\[{_common_link(type_, type_callback)}]"
         if qos_profile is not None:
             # do not link QoS profile
-            out += f"\n    {qos_profile.replace('{', '{\n        ').replace(',', ',\n        ').replace('}', '\n    }')}"
+            formatted_qos = (
+                qos_profile.replace("{", "{\n        ")
+                .replace(",", ",\n        ")
+                .replace("}", "\n    }")
+            )
+            out += f"\n    {formatted_qos}"
 
     return out
 
@@ -176,8 +183,12 @@ class NodeInfo(RosEntityInfo):
 class TopicInfo(RosEntityInfo):
     name: str
     types: list[str] = field(default_factory=list)
-    publishers: list[tuple[str, str | None] | tuple[str, str, str | None]] = field(default_factory=list)
-    subscribers: list[tuple[str, str | None] | tuple[str, str, str | None]] = field(default_factory=list)
+    publishers: list[tuple[str, str | None] | tuple[str, str, str | None]] = field(
+        default_factory=list
+    )
+    subscribers: list[tuple[str, str | None] | tuple[str, str, str | None]] = field(
+        default_factory=list
+    )
 
     def to_textual(self) -> str:
         return f"""[b]Topic:[/b] {self.name}
