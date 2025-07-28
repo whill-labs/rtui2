@@ -41,7 +41,7 @@ profile = "black"
 
 [tool.flake8]
 exclude = ".git,.venv,__pycache__,tests/__init__.py"
-ignore = "E501"
+ignore = "E501,W503"
 max_complexity = 15
 
 [tool.mypy]
