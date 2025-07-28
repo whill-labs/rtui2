@@ -103,7 +103,11 @@ def _common_entities_with_type_and_qos(
             out += f" \\[{_common_link(type_, type_callback)}]"
         if qos_profile is not None:
             # do not link QoS profile
-            formatted_qos = qos_profile.replace('{', '{\n        ').replace(',', ',\n        ').replace('}', '\n    }')
+            formatted_qos = (
+                qos_profile.replace("{", "{\n        ")
+                .replace(",", ",\n        ")
+                .replace("}", "\n    }")
+            )
             out += f"\n    {formatted_qos}"
 
     return out
