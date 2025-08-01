@@ -6,7 +6,7 @@ from textual.screen import Screen
 from textual.widgets import Footer
 
 from .ros import RosClient, RosEntity, RosEntityType
-from .widgets import RosEntityInfoPanel, RosEntityListPanel, RosTypeDefinitionPanel
+from .widgets import RosEntityInfoPanel, RosEntityListPanel, RosEntityGraphPanel, RosTypeDefinitionPanel
 
 
 class RosEntityInspection(Screen):
@@ -14,6 +14,7 @@ class RosEntityInspection(Screen):
     _entity_name: str | None
     _list_panel: RosEntityListPanel
     _info_panel: RosEntityInfoPanel
+    _graph_panel: RosEntityGraphPanel
     _definition_panel: RosTypeDefinitionPanel | None = None
 
     DEFAULT_CSS = """
@@ -50,6 +51,10 @@ class RosEntityInspection(Screen):
             None,
             update_interval=5.0,
         )
+        self._graph_panel = RosEntityGraphPanel(
+            ros,
+            None,
+        )
         if entity_type.has_definition():
             self._definition_panel = RosTypeDefinitionPanel(ros)
 
@@ -57,6 +62,7 @@ class RosEntityInspection(Screen):
         self._entity_name = name
         entity = RosEntity(type=self._entity_type, name=self._entity_name)
         self._info_panel.set_entity(entity)
+        self._graph_panel.set_entity(entity)
         if self._definition_panel is not None:
             self._definition_panel.set_entity(entity)
 
@@ -70,7 +76,9 @@ class RosEntityInspection(Screen):
 
             with Vertical(id="main"):
                 if self._definition_panel is None:
-                    with ScrollableContainer():
+                    with ScrollableContainer(id="main-upper", classes="main-half"):
+                        yield self._graph_panel
+                    with ScrollableContainer(classes="main-half"):
                         yield self._info_panel
                 else:
                     with ScrollableContainer(id="main-upper", classes="main-half"):
