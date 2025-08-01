@@ -4,7 +4,7 @@ from textual.widgets import Static, Tree
 from textual.widgets.tree import TreeNode
 from textual.app import ComposeResult
 
-from ..ros import RosClient, RosEntity
+from ..ros import RosClient, RosEntity, RosEntityType
 from ..ros.dependency_graph import RosDependencyGraph, RosDependencyNode
 
 
@@ -54,4 +54,8 @@ class RosEntityGraphPanel(Static):
                 child_node = parent.add(label)
                 self._populate_tree(child_node, child)
             else:
-                parent.add_leaf(label)
+                if child.entity.type == RosEntityType.Topic:
+                    topic_node = parent.add(label)
+                    topic_node.add_leaf("[yellow][No publisher][/yellow]")
+                else:
+                    parent.add_leaf(f"[green]{label}[/green]")
