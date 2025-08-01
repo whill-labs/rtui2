@@ -13,20 +13,25 @@ class RosDependencyNode:
 
 
 class RosDependencyGraph:
-    def __init__(self, root_entity: RosEntity, ros_client: RosClient) -> None:
+    def __init__(
+        self,
+        root_entity: RosEntity,
+        ros_client: RosClient,
+        max_depth: int = 1
+    ) -> None:
         self._ros = ros_client
-        self.root = self._build_graph(root_entity, visited=set())
+        self._max_depth = max_depth
+        self.root = self._build_graph(root_entity, depth=0, visited=set())
 
     def _build_graph(
         self,
         entity: RosEntity,
+        depth: int,
         visited: set[str]
     ) -> RosDependencyNode:
-        key = f"{entity.type}:{entity.name}"
-        if key in visited:
+        if depth > self._max_depth:
             return RosDependencyNode(entity)
 
-        visited.add(key)
         children: list[RosDependencyNode] = []
 
         try:
@@ -41,7 +46,7 @@ class RosDependencyGraph:
                     continue
 
                 topic_entity = RosEntity.new_topic(topic_name)
-                child_node = self._build_graph(topic_entity, visited)
+                child_node = self._build_graph(topic_entity, depth + 1, visited)
                 children.append(child_node)
 
         elif entity.type == RosEntityType.Topic:
@@ -49,7 +54,7 @@ class RosDependencyGraph:
             for pub_info in info.publishers:
                 pub_node_name = pub_info[0]
                 node_entity = RosEntity.new_node(pub_node_name)
-                child_node = self._build_graph(node_entity, visited)
+                child_node = self._build_graph(node_entity, depth + 1, visited)
                 children.append(child_node)
 
         return RosDependencyNode(entity, children)

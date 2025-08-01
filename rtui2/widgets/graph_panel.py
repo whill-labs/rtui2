@@ -7,6 +7,7 @@ from textual.app import ComposeResult
 from ..ros import RosClient, RosEntity, RosEntityType
 from ..ros.dependency_graph import RosDependencyGraph, RosDependencyNode
 
+EXPANSION_DEPTH = 2
 
 class RosEntityGraphPanel(Static):
     """ROSエンティティの依存関係をツリー表示するパネル"""
@@ -43,19 +44,35 @@ class RosEntityGraphPanel(Static):
         if self._entity is None:
             return
 
-        graph = RosDependencyGraph(self._entity, self._ros)
+        graph = RosDependencyGraph(self._entity, self._ros, max_depth=EXPANSION_DEPTH)
         self._populate_tree(self._tree.root, graph.root)
         self._tree.root.expand()
 
-    def _populate_tree(self, parent: TreeNode, dep_node: RosDependencyNode) -> None:
+    def _populate_tree(
+        self,
+        parent: TreeNode,
+        dep_node: RosDependencyNode,
+        depth: int = 0,
+    ) -> None:
         for child in dep_node.children:
             label = f"{child.entity.name}"
+
             if child.children:
                 child_node = parent.add(label)
-                self._populate_tree(child_node, child)
+                # 再帰的に追加
+                self._populate_tree(child_node, child, depth + 1)
+
+                # 深さに応じて自動展開
+                if depth < EXPANSION_DEPTH - 1:
+                    child_node.expand()
+
             else:
                 if child.entity.type == RosEntityType.Topic:
                     topic_node = parent.add(label)
                     topic_node.add_leaf("[yellow][No publisher][/yellow]")
+
+                    if depth < EXPANSION_DEPTH - 1:
+                        topic_node.expand()
+
                 else:
                     parent.add_leaf(f"[green]{label}[/green]")
