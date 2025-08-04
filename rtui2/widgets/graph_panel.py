@@ -12,13 +12,26 @@ EXPANSION_DEPTH = 2
 
 
 class TreeLabel:
-    LEAF_NODE = lambda label: Text(label, style="green")
-    NO_PUBLISHER = Text("[No publisher]", style="yellow")
-    ERROR = lambda msg: Text(f"Error: {msg}", style="red")
+    @staticmethod
+    def label(entity: RosEntity) -> Text:
+        style = ""
+        if entity.type == RosEntityType.Node:
+            style = "green"
+        elif entity.type == RosEntityType.Topic:
+            style = "white"
+        return Text(entity.name, style=style)
 
     @staticmethod
-    def is_placeholder_label(label: str | Text) -> bool:
-        """[No publisher]のようなplaceholding leafを判定"""
+    def leaf_label(entity: RosEntity) -> Text:
+        text = TreeLabel.label(entity)
+        text.stylize("bold underline")
+        return text
+
+    NO_PUBLISHER = Text("[No publisher]", style="yellow")
+    ERROR = lambda msg: Text(f"ERROR: {msg}", style="red")
+
+    @staticmethod
+    def is_no_publisher(label: str | Text) -> bool:
         plain = label.plain if isinstance(label, Text) else str(label)
         return plain.strip() == "No publisher"
 
@@ -65,19 +78,19 @@ class RosEntityGraphPanel(Static):
             entity = child.entity
 
             if child.children:
-                # 再帰的に追加
-                child_node = parent.add(entity.name, data=entity)
+                label = TreeLabel.label(entity)
+                child_node = parent.add(label, data=entity)
                 self._populate_tree(child_node, child, depth + 1)
                 if depth < EXPANSION_DEPTH - 1:
                     child_node.expand()
             else:
                 if entity.type == RosEntityType.Topic:
-                    topic_node = parent.add(entity.name, data=entity)
+                    topic_node = parent.add(TreeLabel.label(entity), data=entity)
                     topic_node.add_leaf(TreeLabel.NO_PUBLISHER)
                     if depth < EXPANSION_DEPTH - 1:
                         topic_node.expand()
                 else:
-                    parent.add_leaf(TreeLabel.LEAF_NODE(entity.name), data=entity)
+                    parent.add_leaf(TreeLabel.leaf_label(entity), data=entity)
 
     def on_tree_node_selected(self, event: Tree.NodeSelected) -> None:
         node = event.node
@@ -108,7 +121,7 @@ class RosEntityGraphPanel(Static):
 
         valid_children = [
             child for child in node.children
-            if not TreeLabel.is_placeholder_label(child.label)
+            if not TreeLabel.is_no_publisher(child.label)
         ]
 
         if not valid_children:
