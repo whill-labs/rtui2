@@ -67,7 +67,7 @@ class RosEntityGraphPanel(Static):
         if self._entity is None:
             return
 
-        self._tree = Tree(self._entity.name, data=self._entity)
+        self._tree = Tree(TreeLabel.label(self._entity), data=self._entity)
         self.mount(self._tree)
 
         graph = RosDependencyGraph(self._entity, self._ros, max_depth=EXPANSION_DEPTH)
