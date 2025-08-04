@@ -26,27 +26,15 @@ class TreeLabel:
 class RosEntityGraphPanel(Static):
     """ROSエンティティの依存関係をツリー表示するパネル"""
 
-    def __init__(
-        self,
-        ros: RosClient,
-        entity: RosEntity | None = None,
-        *,
-        name: str | None = None,
-        id: str | None = None,
-        classes: str | None = None,
-        disabled: bool = False,
-    ) -> None:
-        super().__init__(name=name, id=id, classes=classes, disabled=disabled)
+    def __init__(self, ros: RosClient, entity: RosEntity | None = None, **kwargs) -> None:
+        super().__init__(**kwargs)
         self._ros = ros
         self._entity = entity
-        self._tree = Tree("Dependency Graph")
+        self._tree: Tree[RosEntity] | None = None
 
     def compose(self) -> ComposeResult:
-        yield self._tree
-
-    def on_mount(self) -> None:
-        if self._entity:
-            self.update_graph()
+        if self._tree:
+            yield self._tree
 
     def set_entity(self, entity: RosEntity) -> None:
         if entity != self._entity:
@@ -54,9 +42,14 @@ class RosEntityGraphPanel(Static):
             self.update_graph()
 
     def update_graph(self) -> None:
-        self._tree.clear()
+        if self._tree:
+            self._tree.remove()
+
         if self._entity is None:
             return
+
+        self._tree = Tree(self._entity.name, data=self._entity)
+        self.mount(self._tree)
 
         graph = RosDependencyGraph(self._entity, self._ros, max_depth=EXPANSION_DEPTH)
         self._populate_tree(self._tree.root, graph.root)
