@@ -103,6 +103,9 @@ class RosEntityGraphPanel(Static):
         if entity.type != RosEntityType.Node:
             return
 
+        if node.children and all(child.is_expanded for child in node.children):
+            return
+
         if self._subtree_depth(node) > EXPANSION_DEPTH:
             return
 
