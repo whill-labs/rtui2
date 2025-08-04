@@ -101,7 +101,8 @@ def main() -> None:
 
     if is_ros2():
         # for discovery server
-        environ["ROS_SUPER_CLIENT"] = "true"
+        if "ROS_SUPER_CLIENT" not in environ:
+            environ["ROS_SUPER_CLIENT"] = "true"
         cli.add_command(action)
         type.add_command(type_action)
 
