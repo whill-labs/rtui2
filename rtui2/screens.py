@@ -82,6 +82,6 @@ class RosEntityInspection(Screen):
                         yield self._info_panel
                 else:
                     with ScrollableContainer(id="main-upper", classes="main-half"):
-                        yield self._info_panel
-                    with ScrollableContainer(classes="main-half"):
                         yield self._definition_panel
+                    with ScrollableContainer(classes="main-half"):
+                        yield self._info_panel
