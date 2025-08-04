@@ -3,11 +3,25 @@ from __future__ import annotations
 from textual.widgets import Static, Tree
 from textual.widgets.tree import TreeNode
 from textual.app import ComposeResult
+from rich.text import Text
 
 from ..ros import RosClient, RosEntity, RosEntityType
 from ..ros.dependency_graph import RosDependencyGraph, RosDependencyNode
 
 EXPANSION_DEPTH = 2
+
+
+class TreeLabel:
+    LEAF_NODE = lambda label: Text(label, style="green")
+    NO_PUBLISHER = Text("[No publisher]", style="yellow")
+    ERROR = lambda msg: Text(f"Error: {msg}", style="red")
+
+    @staticmethod
+    def is_placeholder_label(label: str | Text) -> bool:
+        """[No publisher]のようなplaceholding leafを判定"""
+        plain = label.plain if isinstance(label, Text) else str(label)
+        return plain.strip() == "No publisher"
+
 
 class RosEntityGraphPanel(Static):
     """ROSエンティティの依存関係をツリー表示するパネル"""
@@ -69,10 +83,9 @@ class RosEntityGraphPanel(Static):
             else:
                 if child.entity.type == RosEntityType.Topic:
                     topic_node = parent.add(label)
-                    topic_node.add_leaf("[yellow][No publisher][/yellow]")
-
+                    topic_node.add_leaf(TreeLabel.NO_PUBLISHER)
                     if depth < EXPANSION_DEPTH - 1:
                         topic_node.expand()
-
                 else:
-                    parent.add_leaf(f"[green]{label}[/green]")
+                    parent.add_leaf(TreeLabel.LEAF_NODE(label))
+
