@@ -69,23 +69,56 @@ class RosEntityGraphPanel(Static):
         depth: int = 0,
     ) -> None:
         for child in dep_node.children:
-            label = f"{child.entity.name}"
+            entity = child.entity
 
             if child.children:
-                child_node = parent.add(label)
                 # 再帰的に追加
+                child_node = parent.add(entity.name, data=entity)
                 self._populate_tree(child_node, child, depth + 1)
-
-                # 深さに応じて自動展開
                 if depth < EXPANSION_DEPTH - 1:
                     child_node.expand()
-
             else:
-                if child.entity.type == RosEntityType.Topic:
-                    topic_node = parent.add(label)
+                if entity.type == RosEntityType.Topic:
+                    topic_node = parent.add(entity.name, data=entity)
                     topic_node.add_leaf(TreeLabel.NO_PUBLISHER)
                     if depth < EXPANSION_DEPTH - 1:
                         topic_node.expand()
                 else:
-                    parent.add_leaf(TreeLabel.LEAF_NODE(label))
+                    parent.add_leaf(TreeLabel.LEAF_NODE(entity.name), data=entity)
 
+    def on_tree_node_selected(self, event: Tree.NodeSelected) -> None:
+        node = event.node
+        entity = node.data  # type: RosEntity | None
+
+        if not isinstance(entity, RosEntity):
+            return
+
+        if entity.type != RosEntityType.Node:
+            return
+
+        if self._subtree_depth(node) > EXPANSION_DEPTH:
+            return
+
+        try:
+            node._children.clear()
+            node._expanded = False
+
+            graph = RosDependencyGraph(entity, self._ros, max_depth=EXPANSION_DEPTH)
+            self._populate_tree(node, graph.root)
+            node.expand()
+        except Exception as e:
+            node.add_leaf(TreeLabel.ERROR(str(e)))
+
+    def _subtree_depth(self, node: TreeNode) -> int:
+        if not node.children:
+            return 0
+
+        valid_children = [
+            child for child in node.children
+            if not TreeLabel.is_placeholder_label(child.label)
+        ]
+
+        if not valid_children:
+            return 0
+
+        return 1 + max(self._subtree_depth(child) for child in valid_children)
