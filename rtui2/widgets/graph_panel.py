@@ -3,6 +3,7 @@ from __future__ import annotations
 from textual.widgets import Static, Tree
 from textual.widgets.tree import TreeNode
 from textual.app import ComposeResult
+from textual.events import Key
 from rich.text import Text
 
 from ..ros import RosClient, RosEntity, RosEntityType
@@ -128,3 +129,22 @@ class RosEntityGraphPanel(Static):
             return 0
 
         return 1 + max(self._subtree_depth(child) for child in valid_children)
+
+    async def on_key(self, event: Key) -> None:
+        if event.key == "space":
+            selected_node = self._tree.cursor_node
+            if selected_node is None or selected_node.parent is None:
+                return
+
+            siblings = selected_node.parent.children
+            should_expand = not selected_node.is_expanded
+
+            for sibling in siblings:
+                if should_expand:
+                    sibling.expand()
+                else:
+                    sibling.collapse()
+
+            self.on_tree_node_selected(Tree.NodeSelected(selected_node))
+
+            event.stop()
