@@ -6,7 +6,12 @@ from textual.screen import Screen
 from textual.widgets import Footer
 
 from .ros import RosClient, RosEntity, RosEntityType
-from .widgets import RosEntityInfoPanel, RosEntityListPanel, RosEntityGraphPanel, RosTypeDefinitionPanel
+from .widgets import (
+    RosEntityGraphPanel,
+    RosEntityInfoPanel,
+    RosEntityListPanel,
+    RosTypeDefinitionPanel,
+)
 
 
 class RosEntityInspection(Screen):

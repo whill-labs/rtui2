@@ -1,9 +1,9 @@
 from __future__ import annotations
-from dataclasses import dataclass, field
-from typing import Optional
 
-from .entity import RosEntity, RosEntityType
+from dataclasses import dataclass, field
+
 from .client import RosClient
+from .entity import RosEntity, RosEntityType
 
 
 @dataclass
@@ -14,20 +14,14 @@ class RosDependencyNode:
 
 class RosDependencyGraph:
     def __init__(
-        self,
-        root_entity: RosEntity,
-        ros_client: RosClient,
-        max_depth: int = 1
+        self, root_entity: RosEntity, ros_client: RosClient, max_depth: int = 1
     ) -> None:
         self._ros = ros_client
         self._max_depth = max_depth
         self.root = self._build_graph(root_entity, depth=0, visited=set())
 
     def _build_graph(
-        self,
-        entity: RosEntity,
-        depth: int,
-        visited: set[str]
+        self, entity: RosEntity, depth: int, visited: set[str]
     ) -> RosDependencyNode:
         if depth > self._max_depth:
             return RosDependencyNode(entity)

@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from textual.widgets import Static, Tree
-from textual.widgets.tree import TreeNode
+from rich.text import Text
 from textual.app import ComposeResult
 from textual.events import Key
-from rich.text import Text
+from textual.widgets import Static, Tree
+from textual.widgets.tree import TreeNode
 
 from ..ros import RosClient, RosEntity, RosEntityType
 from ..ros.dependency_graph import RosDependencyGraph, RosDependencyNode
@@ -28,8 +28,11 @@ class TreeLabel:
         text.stylize("bold underline")
         return text
 
+    @staticmethod
+    def error(msg: str) -> Text:
+        return Text(f"ERROR: {msg}", style="red")
+
     NO_PUBLISHER = Text("[No publisher]", style="yellow")
-    ERROR = lambda msg: Text(f"ERROR: {msg}", style="red")
 
     @staticmethod
     def is_no_publisher(label: str | Text) -> bool:
@@ -40,7 +43,9 @@ class TreeLabel:
 class RosEntityGraphPanel(Static):
     """ROSエンティティの依存関係をツリー表示するパネル"""
 
-    def __init__(self, ros: RosClient, entity: RosEntity | None = None, **kwargs) -> None:
+    def __init__(
+        self, ros: RosClient, entity: RosEntity | None = None, **kwargs
+    ) -> None:
         super().__init__(**kwargs)
         self._ros = ros
         self._entity = entity
@@ -124,7 +129,8 @@ class RosEntityGraphPanel(Static):
             return 0
 
         valid_children = [
-            child for child in node.children
+            child
+            for child in node.children
             if not TreeLabel.is_no_publisher(child.label)
         ]
 
