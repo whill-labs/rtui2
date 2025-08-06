@@ -152,9 +152,9 @@ class NodeInfo(RosEntityInfo):
     def to_textual(self) -> str:
         text = f"""[b]Node:[/b] {self.name}
 
-[b]Publishers:[/b]{_common_entities_with_type(self.publishers, "topic_link", "msg_type_link")}
+[b]Publishes:[/b]{_common_entities_with_type(self.publishers, "topic_link", "msg_type_link")}
 
-[b]Subscribers:[/b]{_common_entities_with_type(self.subscribers, "topic_link", "msg_type_link")}
+[b]Subscribes:[/b]{_common_entities_with_type(self.subscribers, "topic_link", "msg_type_link")}
 
 [b]Service Servers:[/b]{_common_entities_with_type(self.service_servers, "service_link", "srv_type_link")}
 """
