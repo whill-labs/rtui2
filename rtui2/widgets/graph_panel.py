@@ -9,7 +9,7 @@ from textual.widgets.tree import TreeNode
 from ..ros import RosClient, RosEntity, RosEntityType
 from ..ros.dependency_graph import RosDependencyGraph, RosDependencyNode
 
-EXPANSION_DEPTH = 2
+EXPAND_UP_TO_NODES = 1
 
 
 class TreeLabel:
@@ -70,9 +70,10 @@ class RosEntityGraphPanel(Static):
         self._tree = Tree(TreeLabel.label(self._entity), data=self._entity)
         self.mount(self._tree)
 
-        graph = RosDependencyGraph(self._entity, self._ros, max_depth=EXPANSION_DEPTH)
+        graph = RosDependencyGraph(
+            self._entity, self._ros, max_depth=EXPAND_UP_TO_NODES
+        )
         self._populate_tree(self._tree.root, graph.root)
-        self._tree.root.expand()
 
     def _populate_tree(
         self,
@@ -86,17 +87,22 @@ class RosEntityGraphPanel(Static):
             if child.children:
                 label = TreeLabel.label(entity)
                 child_node = parent.add(label, data=entity)
-                self._populate_tree(child_node, child, depth + 1)
-                if depth < EXPANSION_DEPTH - 1:
-                    child_node.expand()
+
+                if entity.type == RosEntityType.Node:
+                    self._populate_tree(child_node, child, depth + 1)
+                else:
+                    self._populate_tree(child_node, child, depth)
             else:
                 if entity.type == RosEntityType.Topic:
                     topic_node = parent.add(TreeLabel.label(entity), data=entity)
                     topic_node.add_leaf(TreeLabel.NO_PUBLISHER)
-                    if depth < EXPANSION_DEPTH - 1:
+                    if depth < EXPAND_UP_TO_NODES:
                         topic_node.expand()
                 else:
                     parent.add_leaf(TreeLabel.leaf_label(entity), data=entity)
+
+        if depth < EXPAND_UP_TO_NODES:
+            parent.expand()
 
     def on_tree_node_selected(self, event: Tree.NodeSelected) -> None:
         node = event.node
@@ -105,39 +111,49 @@ class RosEntityGraphPanel(Static):
         if not isinstance(entity, RosEntity):
             return
 
-        if entity.type != RosEntityType.Node:
+        if not node.is_expanded:
             return
 
         if node.children and all(child.is_expanded for child in node.children):
             return
 
-        if self._subtree_depth(node) > EXPANSION_DEPTH:
+        if self._subtree_depth(node) > EXPAND_UP_TO_NODES:
+            return
+
+        self._update_subtree(node)
+
+    def _update_subtree(self, node: TreeNode) -> None:
+        entity = node.data
+        if not isinstance(entity, RosEntity):
             return
 
         try:
-            node._children.clear()
-            node._expanded = False
-
-            graph = RosDependencyGraph(entity, self._ros, max_depth=EXPANSION_DEPTH)
-            self._populate_tree(node, graph.root)
-            node.expand()
+            graph = RosDependencyGraph(entity, self._ros, max_depth=EXPAND_UP_TO_NODES)
+            if graph.root.children:
+                node._children.clear()
+                node._expanded = False
+                self._populate_tree(node, graph.root)
         except Exception as e:
-            node.add_leaf(TreeLabel.ERROR(str(e)))
+            node.add_leaf(TreeLabel.error(str(e)))
 
     def _subtree_depth(self, node: TreeNode) -> int:
         if not node.children:
             return 0
 
-        valid_children = [
-            child
-            for child in node.children
-            if not TreeLabel.is_no_publisher(child.label)
-        ]
+        max_depth = 0
+        for child in node.children:
+            child_entity = child.data
+            child_depth = self._subtree_depth(child)
 
-        if not valid_children:
-            return 0
+            if (
+                isinstance(child_entity, RosEntity)
+                and child_entity.type == RosEntityType.Node
+            ):
+                child_depth += 1
 
-        return 1 + max(self._subtree_depth(child) for child in valid_children)
+            max_depth = max(max_depth, child_depth)
+
+        return max_depth
 
     async def on_key(self, event: Key) -> None:
         if event.key == "space":
