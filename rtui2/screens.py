@@ -57,8 +57,7 @@ class RosEntityInspection(Screen):
             update_interval=5.0,
         )
         self._graph_panel = RosEntityGraphPanel(
-            ros,
-            None,
+            ros, None, on_highlighted_changed=self._info_panel.set_entity
         )
         if entity_type.has_definition():
             self._definition_panel = RosTypeDefinitionPanel(ros)

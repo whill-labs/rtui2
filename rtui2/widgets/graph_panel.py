@@ -6,6 +6,8 @@ from textual.events import Key
 from textual.widgets import Static, Tree
 from textual.widgets.tree import TreeNode
 
+from typing import Callable
+
 from ..ros import RosClient, RosEntity, RosEntityType
 from ..ros.dependency_graph import RosDependencyGraph, RosDependencyNode
 
@@ -42,11 +44,16 @@ class TreeLabel:
 
 class RosEntityGraphPanel(Static):
     def __init__(
-        self, ros: RosClient, entity: RosEntity | None = None, **kwargs
+        self,
+        ros: RosClient,
+        entity: RosEntity | None = None,
+        on_highlighted_changed: Callable[[RosEntity], None] | None = None,
+        **kwargs,
     ) -> None:
         super().__init__(**kwargs)
         self._ros = ros
         self._entity = entity
+        self._on_highlighted_changed = on_highlighted_changed
         self._tree: Tree[RosEntity] | None = None
 
     def compose(self) -> ComposeResult:
@@ -171,3 +178,9 @@ class RosEntityGraphPanel(Static):
             self.on_tree_node_selected(Tree.NodeSelected(selected_node))
 
             event.stop()
+
+    def on_tree_node_highlighted(self, event: Tree.NodeHighlighted) -> None:
+        node = event.node
+        entity = node.data
+        if isinstance(entity, RosEntity) and self._on_highlighted_changed:
+            self._on_highlighted_changed(entity)
