@@ -1,8 +1,9 @@
-# rtui
-
+# rtui2
 [![PyPI - Version](https://img.shields.io/pypi/v/rtui2)](https://pypi.org/project/rtui2/)
 
 TUI tool for ROS 2 Topic/Node debugging
+
+![output](https://github.com/user-attachments/assets/576b9ecd-81cd-4b26-948c-65cea6ce49af)
 
 ## Support
 
