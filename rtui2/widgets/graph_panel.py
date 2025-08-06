@@ -1,12 +1,12 @@
 from __future__ import annotations
 
+from typing import Callable
+
 from rich.text import Text
 from textual.app import ComposeResult
 from textual.events import Key
 from textual.widgets import Static, Tree
 from textual.widgets.tree import TreeNode
-
-from typing import Callable
 
 from ..ros import RosClient, RosEntity, RosEntityType
 from ..ros.dependency_graph import RosDependencyGraph, RosDependencyNode
