@@ -41,8 +41,6 @@ class TreeLabel:
 
 
 class RosEntityGraphPanel(Static):
-    """ROSエンティティの依存関係をツリー表示するパネル"""
-
     def __init__(
         self, ros: RosClient, entity: RosEntity | None = None, **kwargs
     ) -> None:
@@ -106,21 +104,21 @@ class RosEntityGraphPanel(Static):
 
     def on_tree_node_selected(self, event: Tree.NodeSelected) -> None:
         node = event.node
-        entity = node.data  # type: RosEntity | None
+        if self._should_update_subtree(node):
+            self._update_subtree(node)
 
+    def _should_update_subtree(self, node: TreeNode) -> bool:
+        entity = node.data
         if not isinstance(entity, RosEntity):
-            return
-
+            return False
         if not node.is_expanded:
-            return
-
+            return False
         if node.children and all(child.is_expanded for child in node.children):
-            return
-
+            return False
         if self._subtree_depth(node) > EXPAND_UP_TO_NODES:
-            return
+            return False
 
-        self._update_subtree(node)
+        return True
 
     def _update_subtree(self, node: TreeNode) -> None:
         entity = node.data
