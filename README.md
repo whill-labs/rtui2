@@ -8,9 +8,14 @@ TUI tool for ROS 2 Topic/Node debugging
 
 - Python
   - 3.10+
-- ROS2
+- ROS 2
   - Humble
   - Jazzy
+- DDS Implementation
+  - FastDDS Discovery Server mode supported
+    - Compatible with centralized discovery architectures
+    - Requires `ROS_DISCOVERY_SERVER` environment variable for discovery server endpoint
+    - Automatically sets [`ROS_SUPER_CLIENT=true`](https://fast-dds.docs.eprosima.com/en/v2.14.5/fastdds/env_vars/env_vars.html?highlight=super_client#ros-super-client) for enhanced discovery capabilities
 
 ## Install
 
