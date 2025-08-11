@@ -12,6 +12,7 @@ TUI tool for ROS 2 Topic/Node debugging
 - ROS 2
   - Humble
   - Jazzy
+  - Kilted
 - DDS Implementation
   - FastDDS Discovery Server mode supported
     - Compatible with centralized discovery architectures
