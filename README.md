@@ -62,6 +62,8 @@ Commands:
     - `b/f`: Trace history backward and forward
     - `r`: Once more get list of nodes, topics or etc.
     - `q`: Terminate app
+- Set `ROS_DISCOVERY_SERVER` environment variable to enable discovery server mode
+  - e.g. `export ROS_DISCOVERY_SERVER=127.0.0.1:11811`
 
 ## License
 
