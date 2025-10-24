@@ -50,13 +50,13 @@ class RosEntityListPanel(Static):
 
         # Count total elements at top level (including elements without groups)
         total_count = len(entities)
-        
+
         # Update root node name to show total count
         self._tree.root.label = f"{self._entity_type.name} ({total_count})"
 
         for group in sorted(groups):
             # Add child count to group name
-            group_name = f"{group} ({group_counts[group]})"
+            group_name = f"{group} ({group_counts.get(group, 0)})"
             parents[group] = self._tree.root.add(group_name)
 
         for entity in entities:
