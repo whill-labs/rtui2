@@ -21,6 +21,7 @@ PyYAML = "^6.0.1"
 argcomplete = "^3.6.2"
 psutil = "^5.9.0"
 em = "^0.3.0"
+lark = "^1.1.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23"
