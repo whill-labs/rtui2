@@ -50,6 +50,7 @@ jobs:
         ros:
           - { distro: humble, os: ubuntu-22.04 }
           - { distro: jazzy, os: ubuntu-24.04 }
+          - { distro: kilted, os: ubuntu-24.04 }
           - { distro: rolling, os: ubuntu-24.04 }
 
     runs-on: ${{ matrix.ros.os }}
